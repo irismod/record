@@ -2,5 +2,3 @@ vendor
 .DS_Store
 .idea
 .vscode
-build/
-.out
