@@ -42,7 +42,7 @@ func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 	copy(bz[:len(recordBz)], recordBz[:])
 	binary.BigEndian.PutUint16(bz[len(recordBz):], intraTxCounter)
 
-	recordID := getRecordId(bz)
+	recordID := getRecordID(bz)
 	store.Set(types.GetRecordKey(recordID), recordBz)
 
 	// update intraTxCounter + 1
@@ -89,6 +89,6 @@ func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter uint16) {
 	store.Set(types.IntraTxCounterKey, bz)
 }
 
-func getRecordId(bz []byte) []byte {
+func getRecordID(bz []byte) []byte {
 	return tmhash.Sum(bz)
 }

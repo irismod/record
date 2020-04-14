@@ -228,7 +228,7 @@ func NewSimApp(
 		slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
-		record.NewAppModule(app.RecordKeeper),
+		record.NewAppModule(app.RecordKeeper, app.AccountKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -255,13 +255,14 @@ func NewSimApp(
 	// transactions
 	app.sm = module.NewSimulationManager(
 		auth.NewAppModule(app.AccountKeeper),
-		bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
-		supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
-		gov.NewAppModule(app.GovKeeper, app.AccountKeeper, app.SupplyKeeper),
-		mint.NewAppModule(app.MintKeeper),
-		distr.NewAppModule(app.DistrKeeper, app.AccountKeeper, app.SupplyKeeper, app.StakingKeeper),
+		//bank.NewAppModule(app.BankKeeper, app.AccountKeeper),
+		//supply.NewAppModule(app.SupplyKeeper, app.AccountKeeper),
+		//gov.NewAppModule(app.GovKeeper, app.AccountKeeper, app.SupplyKeeper),
+		//mint.NewAppModule(app.MintKeeper),
+		//distr.NewAppModule(app.DistrKeeper, app.AccountKeeper, app.SupplyKeeper, app.StakingKeeper),
 		staking.NewAppModule(app.StakingKeeper, app.AccountKeeper, app.SupplyKeeper),
-		slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
+		//slashing.NewAppModule(app.SlashingKeeper, app.AccountKeeper, app.StakingKeeper),
+		record.NewAppModule(app.RecordKeeper, app.AccountKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -345,6 +346,11 @@ func (app *SimApp) GetTKey(storeKey string) *sdk.TransientStoreKey {
 // NOTE: This is solely to be used for testing purposes.
 func (app *SimApp) GetSubspace(moduleName string) params.Subspace {
 	return app.subspaces[moduleName]
+}
+
+// SimulationManager implements the SimulationApp interface
+func (app *SimApp) SimulationManager() *module.SimulationManager {
+	return app.sm
 }
 
 // GetMaccPerms returns a copy of the module account permissions
