@@ -1,8 +1,8 @@
 package record
 
 import (
-	"github.com/irismod/record/internal/keeper"
-	"github.com/irismod/record/internal/types"
+	"github.com/irismod/record/keeper"
+	"github.com/irismod/record/types"
 )
 
 const (

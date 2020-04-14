@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
-	"github.com/irismod/record/internal/types"
+	"github.com/irismod/record/types"
 )
 
 // GetTxCmd returns the transaction commands for the record module.

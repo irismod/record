@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
 
-	"github.com/irismod/record/internal/types"
+	"github.com/irismod/record/types"
 )
 
 // Rest variable names
