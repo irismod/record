@@ -93,8 +93,10 @@ func genRecord(r *rand.Rand, accs []simulation.Account) (types.Record, error) {
 
 	for i := 0; i <= r.Intn(10); i++ {
 		record.Contents = append(record.Contents, types.Content{
-			Digest:     "test",
-			DigestAlgo: "SHA256",
+			Digest:     simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 1, 50)),
+			DigestAlgo: simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 1, 50)),
+			URI:        simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 0, 50)),
+			Meta:       simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 0, 50)),
 		})
 	}
 
