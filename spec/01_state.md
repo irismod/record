@@ -6,4 +6,4 @@ order: 1
 
 ## Record
 
-- Record: `0x00 -> amino(Record)`
+- Record: `0x01 -> amino(Record)`
