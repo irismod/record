@@ -18,7 +18,7 @@ type MsgCreateRecord struct {
 ```
 
 This message is expected to fail if:
-- the contents' length is 0
+- the length of contents is 0
 - the creator is empty
 - each content parameters are faulty, namely:
     - the initial `Digest` is empty
