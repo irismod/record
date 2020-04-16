@@ -23,5 +23,3 @@ This message is expected to fail if:
 - the parameters of each content are faulty, namely:
     - the `Digest` is empty
     - the `DigestAlgo` is empty
-
-
