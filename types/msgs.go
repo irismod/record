@@ -13,12 +13,6 @@ var (
 	_ sdk.Msg = MsgCreateRecord{}
 )
 
-// MsgCreateRecord - struct for create a record
-type MsgCreateRecord struct {
-	Contents []Content
-	Creator  sdk.AccAddress // the creator of the record
-}
-
 // NewMsgCreateRecord constructs a MsgCreateRecord
 func NewMsgCreateRecord(contents []Content, Creator sdk.AccAddress) MsgCreateRecord {
 	return MsgCreateRecord{

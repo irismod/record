@@ -11,14 +11,16 @@ import (
 )
 
 // DecodeStore unmarshals the KVPair's Value to the corresponding slashing type
-func DecodeStore(cdc *codec.Codec, kvA, kvB tmkv.Pair) string {
-	switch {
-	case bytes.Equal(kvA.Key[:1], types.RecordKey):
-		var recordA, recordB types.Record
-		cdc.MustUnmarshalBinaryLengthPrefixed(kvA.Value, &recordA)
-		cdc.MustUnmarshalBinaryLengthPrefixed(kvB.Value, &recordB)
-		return fmt.Sprintf("%v\n%v", recordA, recordB)
-	default:
-		panic(fmt.Sprintf("invalid record key prefix %X", kvA.Key[:1]))
+func NewDecodeStore(cdc codec.Marshaler) func(kvA, kvB tmkv.Pair) string {
+	return func(kvA, kvB tmkv.Pair) string {
+		switch {
+		case bytes.Equal(kvA.Key[:1], types.RecordKey):
+			var recordA, recordB types.Record
+			cdc.MustUnmarshalBinaryBare(kvA.Value, &recordA)
+			cdc.MustUnmarshalBinaryBare(kvB.Value, &recordB)
+			return fmt.Sprintf("%v\n%v", recordA, recordB)
+		default:
+			panic(fmt.Sprintf("invalid record key prefix %X", kvA.Key[:1]))
+		}
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/simapp/helpers"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
 	"github.com/irismod/record/types"
@@ -20,9 +21,10 @@ const (
 
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
-	appParams simulation.AppParams,
+	appParams simtypes.AppParams,
 	cdc *codec.Codec,
-	ak types.AccountKeeper) simulation.WeightedOperations {
+	ak types.AccountKeeper,
+	bk types.BankKeeper) simulation.WeightedOperations {
 	var weightCreate int
 	appParams.GetOrGenerate(cdc, OpWeightMsgCreateRecord, &weightCreate, nil,
 		func(_ *rand.Rand) {
@@ -32,35 +34,36 @@ func WeightedOperations(
 	return simulation.WeightedOperations{
 		simulation.NewWeightedOperation(
 			weightCreate,
-			SimulateCreateRecord(ak),
+			SimulateCreateRecord(ak, bk),
 		),
 	}
 }
 
 // SimulateCreateRecord tests and runs a single msg create a new record
-func SimulateCreateRecord(ak types.AccountKeeper) simulation.Operation {
+func SimulateCreateRecord(ak types.AccountKeeper, bk types.BankKeeper) simtypes.Operation {
 	return func(
 		r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context,
-		accs []simulation.Account, chainID string,
-	) (simulation.OperationMsg, []simulation.FutureOperation, error) {
+		accs []simtypes.Account, chainID string,
+	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 
 		record, err := genRecord(r, accs)
 		if err != nil {
-			return simulation.NoOpMsg(types.ModuleName), nil, err
+			return simtypes.NoOpMsg(types.ModuleName), nil, err
 		}
 
 		msg := types.NewMsgCreateRecord(record.Contents, record.Creator)
 
-		simAccount, found := simulation.FindAccount(accs, record.Creator)
+		simAccount, found := simtypes.FindAccount(accs, record.Creator)
 		if !found {
-			return simulation.NoOpMsg(types.ModuleName), nil, fmt.Errorf("account %s not found", record.Creator)
+			return simtypes.NoOpMsg(types.ModuleName), nil, fmt.Errorf("account %s not found", record.Creator)
 		}
-		account := ak.GetAccount(ctx, msg.Creator)
 
-		spendable := account.SpendableCoins(ctx.BlockTime())
-		fees, err := simulation.RandomFees(r, ctx, spendable)
+		account := ak.GetAccount(ctx, msg.Creator)
+		spendable := bk.SpendableCoins(ctx, account.GetAddress())
+
+		fees, err := simtypes.RandomFees(r, ctx, spendable)
 		if err != nil {
-			return simulation.NoOpMsg(types.ModuleName), nil, err
+			return simtypes.NoOpMsg(types.ModuleName), nil, err
 		}
 
 		tx := helpers.GenTx(
@@ -74,14 +77,14 @@ func SimulateCreateRecord(ak types.AccountKeeper) simulation.Operation {
 		)
 
 		if _, _, err = app.Deliver(tx); err != nil {
-			return simulation.NoOpMsg(types.ModuleName), nil, err
+			return simtypes.NoOpMsg(types.ModuleName), nil, err
 		}
 
-		return simulation.NewOperationMsg(msg, true, "simulate issue token"), nil, nil
+		return simtypes.NewOperationMsg(msg, true, "simulate issue token"), nil, nil
 	}
 }
 
-func genRecord(r *rand.Rand, accs []simulation.Account) (types.Record, error) {
+func genRecord(r *rand.Rand, accs []simtypes.Account) (types.Record, error) {
 	var record types.Record
 	txHash := make([]byte, 32)
 	_, err := r.Read(txHash)
@@ -93,14 +96,14 @@ func genRecord(r *rand.Rand, accs []simulation.Account) (types.Record, error) {
 
 	for i := 0; i <= r.Intn(10); i++ {
 		record.Contents = append(record.Contents, types.Content{
-			Digest:     simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 1, 50)),
-			DigestAlgo: simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 1, 50)),
-			URI:        simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 0, 50)),
-			Meta:       simulation.RandStringOfLength(r, simulation.RandIntBetween(r, 0, 50)),
+			Digest:     simtypes.RandStringOfLength(r, simtypes.RandIntBetween(r, 1, 50)),
+			DigestAlgo: simtypes.RandStringOfLength(r, simtypes.RandIntBetween(r, 1, 50)),
+			URI:        simtypes.RandStringOfLength(r, simtypes.RandIntBetween(r, 0, 50)),
+			Meta:       simtypes.RandStringOfLength(r, simtypes.RandIntBetween(r, 0, 50)),
 		})
 	}
 
-	acc, _ := simulation.RandomAcc(r, accs)
+	acc, _ := simtypes.RandomAcc(r, accs)
 	record.Creator = acc.Address
 
 	return record, nil
