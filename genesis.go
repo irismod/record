@@ -19,7 +19,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 	var records []Record
 	for ; recordsIterator.Valid(); recordsIterator.Next() {
 		var record Record
-		ModuleCdc.MustUnmarshalBinaryLengthPrefixed(recordsIterator.Value(), &record)
+		ModuleCdc.MustUnmarshalBinaryBare(recordsIterator.Value(), &record)
 		records = append(records, record)
 	}
 

@@ -263,7 +263,7 @@ func NewSimApp(
 	evidenceKeeper.SetRouter(evidenceRouter)
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.RecordKeeper = record.NewKeeper(app.cdc, keys[record.StoreKey])
+	app.RecordKeeper = record.NewKeeper(appCodec, keys[record.StoreKey])
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
