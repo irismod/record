@@ -1,6 +1,6 @@
 module github.com/irismod/record
 
-go 1.13
+go 1.14
 
 require (
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200508021129-c8c47786dab8
