@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"fmt"
 
+	gogotypes "github.com/gogo/protobuf/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
@@ -15,11 +17,11 @@ import (
 // Keeper of the record store
 type Keeper struct {
 	storeKey sdk.StoreKey
-	cdc      *codec.Codec
+	cdc      codec.Marshaler
 }
 
 // NewKeeper returns a record keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey) Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey) Keeper {
 	keeper := Keeper{
 		storeKey: key,
 		cdc:      cdc,
@@ -35,12 +37,12 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // AddRecord add a record
 func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 	store := ctx.KVStore(k.storeKey)
-	recordBz := k.cdc.MustMarshalBinaryLengthPrefixed(record)
+	recordBz := k.cdc.MustMarshalBinaryBare(&record)
 	intraTxCounter := k.GetIntraTxCounter(ctx)
 
-	bz := make([]byte, 2+len(recordBz))
+	bz := make([]byte, 4+len(recordBz))
 	copy(bz[:len(recordBz)], recordBz[:])
-	binary.BigEndian.PutUint16(bz[len(recordBz):], intraTxCounter)
+	binary.BigEndian.PutUint32(bz[len(recordBz):], intraTxCounter)
 
 	recordID := getRecordID(bz)
 	store.Set(types.GetRecordKey(recordID), recordBz)
@@ -54,7 +56,7 @@ func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {
 func (k Keeper) GetRecord(ctx sdk.Context, recordID []byte) (record types.Record, found bool) {
 	store := ctx.KVStore(k.storeKey)
 	if bz := store.Get(types.GetRecordKey(recordID)); bz != nil {
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(bz, &record)
+		k.cdc.MustUnmarshalBinaryBare(bz, &record)
 		return record, true
 	}
 	return record, false
@@ -67,7 +69,7 @@ func (k Keeper) RecordsIterator(ctx sdk.Context) sdk.Iterator {
 }
 
 // GetIntraTxCounter gets the current in-block request operation counter
-func (k Keeper) GetIntraTxCounter(ctx sdk.Context) uint16 {
+func (k Keeper) GetIntraTxCounter(ctx sdk.Context) uint32 {
 	store := ctx.KVStore(k.storeKey)
 
 	b := store.Get(types.IntraTxCounterKey)
@@ -75,17 +77,17 @@ func (k Keeper) GetIntraTxCounter(ctx sdk.Context) uint16 {
 		return 0
 	}
 
-	var counter uint16
-	k.cdc.MustUnmarshalBinaryLengthPrefixed(b, &counter)
+	var counter gogotypes.UInt32Value
+	k.cdc.MustUnmarshalBinaryBare(b, &counter)
 
-	return counter
+	return counter.Value
 }
 
 // SetIntraTxCounter sets the current in-block request counter
-func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter uint16) {
+func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter uint32) {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(counter)
+	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt32Value{Value: counter})
 	store.Set(types.IntraTxCounterKey, bz)
 }
 

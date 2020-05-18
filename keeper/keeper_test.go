@@ -55,7 +55,7 @@ func (suite *KeeperTestSuite) TestAddRecord() {
 	suite.Equal(testRecord, addedRecord)
 
 	// check IntraTxCounter
-	suite.Equal(uint16(1), suite.keeper.GetIntraTxCounter(suite.ctx))
+	suite.Equal(uint32(1), suite.keeper.GetIntraTxCounter(suite.ctx))
 
 	// add the same record, return different record id
 	recordID2 := suite.keeper.AddRecord(suite.ctx, testRecord)
@@ -69,7 +69,7 @@ func (suite *KeeperTestSuite) TestAddRecord() {
 	var records []types.Record
 	for ; recordsIterator.Valid(); recordsIterator.Next() {
 		var record types.Record
-		suite.cdc.MustUnmarshalBinaryLengthPrefixed(recordsIterator.Value(), &record)
+		suite.cdc.MustUnmarshalBinaryBare(recordsIterator.Value(), &record)
 		records = append(records, record)
 	}
 	suite.Equal(2, len(records))

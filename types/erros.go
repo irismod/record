@@ -6,5 +6,5 @@ import (
 
 // record module sentinel errors
 var (
-	ErrUnknownRecord = sdkerrors.Register(ModuleName, 1, "unknown record")
+	ErrUnknownRecord = sdkerrors.Register(ModuleName, 2, "unknown record")
 )

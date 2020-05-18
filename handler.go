@@ -40,5 +40,5 @@ func handleMsgCreateRecord(ctx sdk.Context, k Keeper, msg MsgCreateRecord) (*sdk
 		),
 	})
 
-	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+	return &sdk.Result{Events: ctx.EventManager().ABCIEvents()}, nil
 }
