@@ -2,6 +2,7 @@ package record
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irismod/record/types"
 )
 
 // InitGenesis stores genesis data
@@ -9,6 +10,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 	for _, record := range data.Records {
 		keeper.AddRecord(ctx, record)
 	}
+	_ = keeper.BindPort(ctx,types.PortKey)
 }
 
 // ExportGenesis outputs genesis data

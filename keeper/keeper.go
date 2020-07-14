@@ -8,6 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/capability"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -16,15 +17,19 @@ import (
 
 // Keeper of the record store
 type Keeper struct {
-	storeKey sdk.StoreKey
-	cdc      codec.Marshaler
+	storeKey     sdk.StoreKey
+	cdc          codec.Marshaler
+	portKeeper   types.PortKeeper
+	scopedKeeper capability.ScopedKeeper
 }
 
 // NewKeeper returns a record keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey) Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, pk types.PortKeeper, sk capability.ScopedKeeper) Keeper {
 	keeper := Keeper{
-		storeKey: key,
-		cdc:      cdc,
+		storeKey:     key,
+		cdc:          cdc,
+		portKeeper:   pk,
+		scopedKeeper: sk,
 	}
 	return keeper
 }
@@ -33,6 +38,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey) Keeper {
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("irismod/%s", types.ModuleName))
 }
+
 
 // AddRecord add a record
 func (k Keeper) AddRecord(ctx sdk.Context, record types.Record) []byte {

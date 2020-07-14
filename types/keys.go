@@ -16,6 +16,9 @@ const (
 
 	// Query endpoints supported by the record querier
 	QueryRecord = "record"
+
+	// Key to store portID in our store
+	PortKey = "portID"
 )
 
 var (

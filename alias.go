@@ -35,5 +35,6 @@ type (
 	Record          = types.Record
 	RecordOutput    = types.RecordOutput
 	Content         = types.Content
+	Packet         = types.Packet
 	MsgCreateRecord = types.MsgCreateRecord
 )

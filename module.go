@@ -1,6 +1,7 @@
 package record
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"math/rand"
 
@@ -12,8 +13,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+	"github.com/cosmos/cosmos-sdk/x/capability"
+	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/04-channel/types"
+	port "github.com/cosmos/cosmos-sdk/x/ibc/05-port"
+	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/05-port/types"
+	ibctypes "github.com/cosmos/cosmos-sdk/x/ibc/types"
 
 	"github.com/irismod/record/client/cli"
 	"github.com/irismod/record/client/rest"
@@ -25,6 +32,8 @@ var (
 	_ module.AppModule           = AppModule{}
 	_ module.AppModuleBasic      = AppModuleBasic{}
 	_ module.AppModuleSimulation = AppModule{}
+
+	_ port.IBCModule = AppModule{}
 )
 
 // AppModuleBasic defines the basic application module used by the record module.
@@ -167,4 +176,117 @@ func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
 // WeightedOperations returns the all the slashing module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, am.accountKeeper, am.bankKeeper)
+}
+
+// Implement IBCModule callbacks
+func (am AppModule) OnChanOpenInit(
+	ctx sdk.Context,
+	order ibctypes.Order,
+	connectionHops []string,
+	portID string,
+	channelID string,
+	channelCap *capability.Capability,
+	counterParty channeltypes.Counterparty,
+	version string,
+) error {
+	//nothing
+	return nil
+}
+
+func (am AppModule) OnChanOpenTry(
+	ctx sdk.Context,
+	order ibctypes.Order,
+	connectionHops []string,
+	portID, channelID string,
+	channelCap *capability.Capability,
+	counterparty channeltypes.Counterparty,
+	version,
+	counterpartyVersion string,
+) error {
+	//nothing
+	return nil
+}
+
+func (am AppModule) OnChanOpenAck(
+	ctx sdk.Context,
+	portID, channelID string,
+	counterpartyVersion string,
+) error {
+	//nothing
+	return nil
+}
+
+func (am AppModule) OnChanOpenConfirm(
+	ctx sdk.Context,
+	portID,
+	channelID string,
+) error {
+	//nothing
+	return nil
+}
+
+func (am AppModule) OnChanCloseInit(
+	ctx sdk.Context,
+	portID,
+	channelID string,
+) error {
+	//nothing
+	return nil
+}
+
+func (am AppModule) OnChanCloseConfirm(
+	ctx sdk.Context,
+	portID, channelID string,
+) error {
+	//nothing
+	return nil
+}
+
+func (am AppModule) OnRecvPacket(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+) (*sdk.Result, error) {
+	portID := am.keeper.GetPort(ctx)
+	if portID != packet.DestinationPort {
+		return nil,sdkerrors.Wrapf(porttypes.ErrInvalidPort, "invalid port: %s, expected %s", portID, packet.DestinationPort)
+	}
+
+	var data Packet
+	if err := ModuleCdc.UnmarshalJSON(packet.GetData(), &data); err != nil {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "cannot unmarshal record packet data: %s", err.Error())
+	}
+
+	recordID,err := am.keeper.PacketExecute(ctx,data)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			EventTypeCreateRecord,
+			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(AttributeKeyRecordID, hex.EncodeToString(recordID)),
+		),
+	)
+
+	return &sdk.Result{
+		Events: ctx.EventManager().Events().ToABCIEvents(),
+	}, nil
+}
+
+func (am AppModule) OnAcknowledgementPacket(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+	acknowledgement []byte,
+) (*sdk.Result, error) {
+	//nothing
+	return nil, nil
+}
+
+func (am AppModule) OnTimeoutPacket(
+	ctx sdk.Context,
+	packet channeltypes.Packet,
+) (*sdk.Result, error) {
+	//nothing
+	return nil, nil
 }
