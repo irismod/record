@@ -9,6 +9,7 @@ import (
 // on the provided Amino codec. These types are used for Amino JSON serialization.
 func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateRecord{}, "irismod/record/MsgCreateRecord", nil)
+	cdc.RegisterConcrete(Packet{}, "irismod/record/Packet", nil)
 }
 
 var (

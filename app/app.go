@@ -246,11 +246,15 @@ func NewSimApp(
 		app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
+	app.RecordKeeper = record.NewKeeper(appCodec, keys[record.StoreKey])
+
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
+	recordModule := record.NewAppModule(app.RecordKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := port.NewRouter()
 	ibcRouter.AddRoute(transfer.ModuleName, transferModule)
+	ibcRouter.AddRoute(record.ModuleName, recordModule)
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// create evidence keeper with router
@@ -262,8 +266,6 @@ func NewSimApp(
 
 	evidenceKeeper.SetRouter(evidenceRouter)
 	app.EvidenceKeeper = *evidenceKeeper
-
-	app.RecordKeeper = record.NewKeeper(appCodec, keys[record.StoreKey])
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -283,7 +285,7 @@ func NewSimApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		record.NewAppModule(app.RecordKeeper, app.AccountKeeper, app.BankKeeper),
+		recordModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
