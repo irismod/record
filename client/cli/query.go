@@ -1,22 +1,19 @@
 package cli
 
 import (
+	"context"
 	"encoding/hex"
 	"errors"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/irismod/record/types"
 )
 
 // GetQueryCmd returns the cli query commands for the record module.
-func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
+func GetQueryCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the record module",
@@ -24,46 +21,41 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(flags.GetCommands(
-		GetCmdQueryRecord(cdc),
-	)...)
+	txCmd.AddCommand(
+		GetCmdQueryRecord(),
+	)
 	return txCmd
 }
 
 // GetCmdQueryRecord implements the query record command.
-func GetCmdQueryRecord(cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryRecord() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "record [record-id]",
 		Short: "Query a record",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			recordID, err := hex.DecodeString(args[0])
 			if err != nil {
 				return errors.New("invalid record id, must be hex encoded string")
 			}
 
-			params := types.QueryRecordParams{
-				RecordID: recordID,
-			}
+			queryClient := types.NewQueryClient(clientCtx)
 
-			bz, err := cdc.MarshalJSON(params)
+			res, err := queryClient.Record(context.Background(), &types.QueryRecordRequest{
+				Recordid: recordID,
+			})
+
 			if err != nil {
 				return err
 			}
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/%s", types.QuerierRoute, types.QueryRecord), bz)
-			if err != nil {
-				return err
-			}
-
-			var record types.RecordOutput
-			if err := cdc.UnmarshalJSON(res, &record); err != nil {
-				return err
-			}
-
-			return cliCtx.PrintOutput(record)
+			return clientCtx.PrintOutput(res.Record)
 		},
 	}
 	return cmd

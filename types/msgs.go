@@ -9,13 +9,11 @@ const (
 	TypeMsgCreateRecord = "create_record" // type for TypeMsgCreateRecord
 )
 
-var (
-	_ sdk.Msg = MsgCreateRecord{}
-)
+var _ sdk.Msg = &MsgCreateRecord{}
 
 // NewMsgCreateRecord constructs a MsgCreateRecord
-func NewMsgCreateRecord(contents []Content, Creator sdk.AccAddress) MsgCreateRecord {
-	return MsgCreateRecord{
+func NewMsgCreateRecord(contents []Content, Creator sdk.AccAddress) *MsgCreateRecord {
+	return &MsgCreateRecord{
 		Contents: contents,
 		Creator:  Creator,
 	}
