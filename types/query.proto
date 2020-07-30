@@ -1,0 +1,24 @@
+syntax = "proto3";
+package irismod.record;
+
+import "types/types.proto";
+
+option go_package = "github.com/irismod/record/types";
+
+// Query provides defines the gRPC querier service
+service Query {
+    // Supply queries the balance of a single coin for a single account
+    rpc Record (QueryRecordRequest) returns (QueryRecordResponse) {
+    }
+}
+
+// QueryRecordRequest is the request type for the Query/Record RPC method
+message QueryRecordRequest {
+    // address is the address to query balances for
+    bytes recordid = 1;
+}
+
+// QueryRecordResponse is the response type for the Query/Record RPC method
+message QueryRecordResponse {
+    record.Record record = 1;
+}

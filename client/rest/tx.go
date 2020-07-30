@@ -5,7 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
@@ -13,11 +13,11 @@ import (
 	"github.com/irismod/record/types"
 )
 
-func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/record/records", recordPostHandlerFn(cliCtx)).Methods("POST")
 }
 
-func recordPostHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func recordPostHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req RecordCreateReq
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {

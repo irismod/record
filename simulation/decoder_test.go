@@ -24,13 +24,14 @@ var (
 	creatorAddr1 = sdk.AccAddress(creatorPk1.Address())
 )
 
-func makeTestCodec() (*std.Codec, *codec.Codec) {
+func makeTestCodec() (codec.Marshaler, *codec.Codec) {
 	cdc := std.MakeCodec(simapp.ModuleBasics)
 	types.RegisterCodec(cdc)
 	interfaceRegistry := cdctypes.NewInterfaceRegistry()
 	sdk.RegisterInterfaces(interfaceRegistry)
 	simapp.ModuleBasics.RegisterInterfaceModules(interfaceRegistry)
-	appCodec := std.NewAppCodec(cdc, interfaceRegistry)
+	encodingConfig := simapp.MakeEncodingConfig()
+	appCodec := encodingConfig.Marshaler
 	return appCodec, cdc
 }
 
