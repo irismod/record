@@ -441,7 +441,7 @@ func (app *SimApp) ModuleAccountAddrs() map[string]bool {
 }
 
 // BlockedAddrs returns all the app's module account addresses that are not
-// allowed to receive external tokens.
+// allowed to receive external records.
 func (app *SimApp) BlockedAddrs() map[string]bool {
 	blockedAddrs := make(map[string]bool)
 	for acc := range maccPerms {

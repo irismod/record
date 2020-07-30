@@ -20,7 +20,6 @@ message MsgCreateRecord {
 // Content defines a detail information for a record.
 message Content {
   option (gogoproto.equal)            = true;
-  // option (gogoproto.goproto_stringer) = false;
 
   string  digest      = 1;
   string  digest_algo = 2 [(gogoproto.moretags) = "yaml:\"digest_algo\""];
@@ -33,7 +32,6 @@ message Content {
 
 message Record {
   option (gogoproto.equal)            = true;
-  // option (gogoproto.goproto_stringer) = false;
 
   bytes tx_hash  = 1 [
     (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",

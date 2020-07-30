@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"encoding/binary"
 	"fmt"
 
@@ -90,14 +89,6 @@ func (k Keeper) SetIntraTxCounter(ctx sdk.Context, counter uint32) {
 
 	bz := k.cdc.MustMarshalBinaryBare(&gogotypes.UInt32Value{Value: counter})
 	store.Set(types.IntraTxCounterKey, bz)
-}
-
-func (k Keeper) Record(c context.Context, req *types.QueryRecordRequest) (*types.QueryRecordResponse, error) {
-	ctx := sdk.UnwrapSDKContext(c)
-	record, _ := k.GetRecord(ctx, req.Recordid)
-	return &types.QueryRecordResponse{
-		Record: &record,
-	}, nil
 }
 
 func getRecordID(bz []byte) []byte {
