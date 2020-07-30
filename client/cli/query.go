@@ -8,23 +8,24 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/irismod/record/types"
 )
 
 // GetQueryCmd returns the cli query commands for the record module.
 func GetQueryCmd() *cobra.Command {
-	txCmd := &cobra.Command{
+	queryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the record module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
-	txCmd.AddCommand(
+	queryCmd.AddCommand(
 		GetCmdQueryRecord(),
 	)
-	return txCmd
+	return queryCmd
 }
 
 // GetCmdQueryRecord implements the query record command.
@@ -58,5 +59,8 @@ func GetCmdQueryRecord() *cobra.Command {
 			return clientCtx.PrintOutput(res.Record)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
 	return cmd
 }

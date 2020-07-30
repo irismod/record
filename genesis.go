@@ -35,7 +35,7 @@ func DefaultGenesisState() types.GenesisState {
 	return types.GenesisState{}
 }
 
-// ValidateGenesis validates the provided token genesis state to ensure the
+// ValidateGenesis validates the provided record genesis state to ensure the
 // expected invariants holds.
 func ValidateGenesis(data types.GenesisState) error {
 	for _, record := range data.Records {
