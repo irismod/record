@@ -1,27 +1,58 @@
 package record
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/irismod/record/keeper"
+	"github.com/irismod/record/types"
 )
 
 // InitGenesis stores genesis data
-func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	for _, record := range data.Records {
-		keeper.AddRecord(ctx, record)
+		k.AddRecord(ctx, record)
 	}
 }
 
 // ExportGenesis outputs genesis data
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 	recordsIterator := k.RecordsIterator(ctx)
 	defer recordsIterator.Close()
 
-	var records []Record
+	var records []types.Record
 	for ; recordsIterator.Valid(); recordsIterator.Next() {
-		var record Record
-		ModuleCdc.MustUnmarshalBinaryBare(recordsIterator.Value(), &record)
+		var record types.Record
+		types.ModuleCdc.MustUnmarshalBinaryBare(recordsIterator.Value(), &record)
 		records = append(records, record)
 	}
 
-	return NewGenesisState(records)
+	return types.NewGenesisState(records)
+}
+
+// DefaultGenesisState gets raw genesis raw message for testing
+func DefaultGenesisState() types.GenesisState {
+	return types.GenesisState{}
+}
+
+// ValidateGenesis validates the provided record genesis state to ensure the
+// expected invariants holds.
+func ValidateGenesis(data types.GenesisState) error {
+	for _, record := range data.Records {
+		if len(record.Contents) == 0 {
+			return fmt.Errorf("contents missing")
+		}
+		if record.Creator.Empty() {
+			return fmt.Errorf("Creator missing")
+		}
+		for _, content := range record.Contents {
+			if len(content.Digest) == 0 {
+				return fmt.Errorf("Digest missing")
+			}
+			if len(content.DigestAlgo) == 0 {
+				return fmt.Errorf("DigestAlgo missing")
+			}
+		}
+	}
+	return nil
 }

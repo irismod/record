@@ -7,17 +7,17 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 
 	"github.com/irismod/record/types"
 )
 
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc(fmt.Sprintf("/record/records/{%s}", RestRecordID), queryRecordHandlerFn(cliCtx)).Methods("GET")
 }
 
-func queryRecordHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func queryRecordHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		recordID, err := hex.DecodeString(vars[RestRecordID])

@@ -4,6 +4,8 @@ package irismod.record;
 import "third_party/proto/gogoproto/gogo.proto";
 
 option go_package = "github.com/irismod/record/types";
+option (gogoproto.goproto_getters_all)  = false;
+
 
 // MsgCreateValidator defines an SDK message for creating a new validator.
 message MsgCreateRecord {

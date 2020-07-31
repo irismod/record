@@ -3,7 +3,6 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/irismod/record"
 	simapp "github.com/irismod/record/app"
 	"github.com/irismod/record/keeper"
 	"github.com/irismod/record/types"
@@ -47,7 +46,7 @@ func (suite *KeeperTestSuite) TestAddRecord() {
 		URI:        "localhost:1317",
 		Meta:       "test",
 	}
-	testRecord := record.NewRecord([]byte("test"), []types.Content{content}, testCreator)
+	testRecord := types.NewRecord([]byte("test"), []types.Content{content}, testCreator)
 
 	recordID := suite.keeper.AddRecord(suite.ctx, testRecord)
 	addedRecord, found := suite.keeper.GetRecord(suite.ctx, recordID)

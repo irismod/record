@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
@@ -15,8 +15,8 @@ const (
 	RestRecordID = "record-id"
 )
 
-// RegisterRoutes defines routes that get registered by the main application
-func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
+// RegisterHandle defines routes that get registered by the main application
+func RegisterHandle(cliCtx client.Context, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)
 	registerTxRoutes(cliCtx, r)
 }

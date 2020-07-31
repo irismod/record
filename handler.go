@@ -3,40 +3,43 @@ package record
 import (
 	"encoding/hex"
 
+	"github.com/irismod/record/keeper"
+	"github.com/irismod/record/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 )
 
 // NewHandler returns a handler for all "record" type messages.
-func NewHandler(k Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		case MsgCreateRecord:
+		case *types.MsgCreateRecord:
 			return handleMsgCreateRecord(ctx, k, msg)
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized record message type: %T", msg)
 		}
 	}
 }
 
 // handleMsgCreateRecord handles MsgCreateRecord
-func handleMsgCreateRecord(ctx sdk.Context, k Keeper, msg MsgCreateRecord) (*sdk.Result, error) {
-	record := NewRecord(tmhash.Sum(ctx.TxBytes()), msg.Contents, msg.Creator)
+func handleMsgCreateRecord(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateRecord) (*sdk.Result, error) {
+	record := types.NewRecord(tmhash.Sum(ctx.TxBytes()), msg.Contents, msg.Creator)
 	recordId := k.AddRecord(ctx, record)
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Creator.String()),
 		),
 		sdk.NewEvent(
-			EventTypeCreateRecord,
-			sdk.NewAttribute(AttributeKeyCreator, msg.Creator.String()),
-			sdk.NewAttribute(AttributeKeyRecordID, hex.EncodeToString(recordId)),
+			types.EventTypeCreateRecord,
+			sdk.NewAttribute(types.AttributeKeyCreator, msg.Creator.String()),
+			sdk.NewAttribute(types.AttributeKeyRecordID, hex.EncodeToString(recordId)),
 		),
 	})
 
