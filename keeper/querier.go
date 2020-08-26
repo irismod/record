@@ -10,20 +10,20 @@ import (
 )
 
 // NewQuerier creates a querier for record REST endpoints
-func NewQuerier(k Keeper) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryRecord:
-			return queryRecord(ctx, k, req)
+			return queryRecord(ctx, k, req, legacyQuerierCdc)
 		default:
 			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown query path: %s", path[0])
 		}
 	}
 }
 
-func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery) ([]byte, error) {
+func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
 	var params types.QueryRecordParams
-	err := k.cdc.UnmarshalJSON(req.Data, &params)
+	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
@@ -39,7 +39,7 @@ func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery) ([]byte, erro
 		Creator:  record.Creator,
 	}
 
-	bz, err := codec.MarshalJSONIndent(k.cdc, recordOutput)
+	bz, err := codec.MarshalJSONIndent(legacyQuerierCdc, recordOutput)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

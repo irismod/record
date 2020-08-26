@@ -3,15 +3,15 @@ package keeper_test
 import (
 	"testing"
 
-	simapp "github.com/irismod/record/app"
-	"github.com/irismod/record/keeper"
-	"github.com/irismod/record/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+
+	simapp "github.com/irismod/record/app"
+	"github.com/irismod/record/keeper"
+	"github.com/irismod/record/types"
 )
 
 var (
@@ -21,7 +21,7 @@ var (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	cdc    *codec.Codec
+	cdc    codec.Marshaler
 	ctx    sdk.Context
 	keeper keeper.Keeper
 }
@@ -29,8 +29,8 @@ type KeeperTestSuite struct {
 func (suite *KeeperTestSuite) SetupTest() {
 	app := simapp.Setup(false)
 
-	suite.cdc = app.Codec()
-	suite.ctx = app.BaseApp.NewContext(false, abci.Header{})
+	suite.cdc = codec.NewAminoCodec(app.LegacyAmino())
+	suite.ctx = app.BaseApp.NewContext(false, tmproto.Header{})
 	suite.keeper = app.RecordKeeper
 	suite.keeper.SetIntraTxCounter(suite.ctx, 0)
 }

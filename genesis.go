@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/irismod/record/keeper"
 	"github.com/irismod/record/types"
 )
@@ -16,7 +17,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 }
 
 // ExportGenesis outputs genesis data
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	recordsIterator := k.RecordsIterator(ctx)
 	defer recordsIterator.Close()
 
@@ -28,11 +29,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 	}
 
 	return types.NewGenesisState(records)
-}
-
-// DefaultGenesisState gets raw genesis raw message for testing
-func DefaultGenesisState() types.GenesisState {
-	return types.GenesisState{}
 }
 
 // ValidateGenesis validates the provided record genesis state to ensure the
