@@ -11,6 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
+
 	"github.com/irismod/record/types"
 )
 
@@ -22,7 +23,7 @@ const (
 // WeightedOperations returns all the operations from the module with their respective weights
 func WeightedOperations(
 	appParams simtypes.AppParams,
-	cdc *codec.Codec,
+	cdc codec.JSONMarshaler,
 	ak types.AccountKeeper,
 	bk types.BankKeeper) simulation.WeightedOperations {
 	var weightCreate int
