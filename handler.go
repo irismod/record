@@ -3,12 +3,13 @@ package record
 import (
 	"encoding/hex"
 
-	"github.com/irismod/record/keeper"
-	"github.com/irismod/record/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/tendermint/tendermint/crypto/tmhash"
+
+	"github.com/irismod/record/keeper"
+	"github.com/irismod/record/types"
 )
 
 // NewHandler returns a handler for all "record" type messages.

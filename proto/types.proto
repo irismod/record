@@ -1,11 +1,10 @@
 syntax = "proto3";
 package irismod.record;
 
-import "third_party/proto/gogoproto/gogo.proto";
+import "gogoproto/gogo.proto";
 
 option go_package = "github.com/irismod/record/types";
 option (gogoproto.goproto_getters_all)  = false;
-
 
 // MsgCreateValidator defines an SDK message for creating a new validator.
 message MsgCreateRecord {
@@ -17,16 +16,13 @@ message MsgCreateRecord {
   ];
 }
 
-// Content defines a detail information for a record.
+// Content defines the detailed information for a record.
 message Content {
   option (gogoproto.equal)            = true;
 
   string  digest      = 1;
   string  digest_algo = 2 [(gogoproto.moretags) = "yaml:\"digest_algo\""];
-  string  uri  = 3 [
-    (gogoproto.moretags) = "yaml:\"uri\"",
-    (gogoproto.customname) = "URI"
-  ];
+  string  uri  = 3 [(gogoproto.customname) = "URI"];
   string  meta = 4;
 }
 
@@ -34,8 +30,8 @@ message Record {
   option (gogoproto.equal)            = true;
 
   bytes tx_hash  = 1 [
-    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes",
-    (gogoproto.moretags) = "yaml:\"tx_hash\""
+    (gogoproto.moretags) = "yaml:\"tx_hash\"",
+    (gogoproto.casttype) = "github.com/tendermint/tendermint/libs/bytes.HexBytes"
   ];
   repeated Content contents = 2 [(gogoproto.nullable) = false];
   bytes            creator  = 3 [
