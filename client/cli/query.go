@@ -49,7 +49,7 @@ func GetCmdQueryRecord() *cobra.Command {
 			queryClient := types.NewQueryClient(clientCtx)
 
 			res, err := queryClient.Record(context.Background(), &types.QueryRecordRequest{
-				Recordid: recordID,
+				RecordId: recordID,
 			})
 
 			if err != nil {
