@@ -11,8 +11,8 @@ import (
 	"github.com/irismod/record/types"
 )
 
-// GetTxCmd returns the transaction commands for the record module.
-func GetTxCmd() *cobra.Command {
+// NewTxCmd returns the transaction commands for the record module.
+func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Record transaction subcommands",

@@ -34,7 +34,7 @@ func queryRecordHandlerFn(cliCtx client.Context) http.HandlerFunc {
 			RecordID: recordID,
 		}
 
-		bz, err := cliCtx.JSONMarshaler.MarshalJSON(params)
+		bz, err := cliCtx.LegacyAmino.MarshalJSON(params)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

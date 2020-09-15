@@ -11,7 +11,7 @@ import (
 )
 
 // NewQuerier creates a querier for record REST endpoints
-func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
+func NewQuerier(k Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case types.QueryRecord:
@@ -22,7 +22,7 @@ func NewQuerier(k Keeper, legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
 	}
 }
 
-func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery, legacyQuerierCdc codec.JSONMarshaler) ([]byte, error) {
+func queryRecord(ctx sdk.Context, k Keeper, req abci.RequestQuery, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryRecordParams
 	err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params)
 	if err != nil {

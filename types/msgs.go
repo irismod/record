@@ -27,7 +27,7 @@ func (msg MsgCreateRecord) Type() string { return TypeMsgCreateRecord }
 
 // GetSignBytes implements Msg.
 func (msg MsgCreateRecord) GetSignBytes() []byte {
-	b, err := ModuleCdc.MarshalJSON(msg)
+	b, err := ModuleCdc.MarshalJSON(&msg)
 	if err != nil {
 		panic(err)
 	}

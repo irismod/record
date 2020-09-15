@@ -16,8 +16,8 @@ const (
 	RestRecordID = "record-id"
 )
 
-// RegisterHandle defines routes that get registered by the main application
-func RegisterHandle(cliCtx client.Context, r *mux.Router) {
+// RegisterHandlers defines routes that get registered by the main application
+func RegisterHandlers(cliCtx client.Context, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)
 	registerTxRoutes(cliCtx, r)
 }
