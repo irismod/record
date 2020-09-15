@@ -19,7 +19,7 @@ func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 func recordPostHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req RecordCreateReq
-		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 

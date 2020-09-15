@@ -1,9 +1,9 @@
 package simulation
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
 	"github.com/irismod/record/types"
@@ -19,6 +19,11 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 	recordGenesis := types.NewGenesisState(records)
 
-	fmt.Printf("Selected randomly generated record parameters:\n%s\n", codec.MustMarshalJSONIndent(simState.Cdc, recordGenesis))
+	bz, err := json.MarshalIndent(&recordGenesis, "", " ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Selected randomly generated %s parameters:\n%s\n", types.ModuleName, bz)
+
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(recordGenesis)
 }
